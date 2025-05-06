@@ -54,7 +54,8 @@ public:
           value(0), color(color) {}
 
     void update(size_t new_value) {
-        value.store(new_value);
+        // Ensure we don't exceed total (which would show >100%)
+        value.store(std::min(new_value, total));
     }
 
     std::string print() const {
@@ -95,8 +96,8 @@ public:
         return total;
     }
     
-    void set_total(size_t new_total) {
-        total = new_total;
+    void set_total(size_t new_total) const {
+        const_cast<size_t&>(total) = new_total;
     }
 };
 
@@ -356,9 +357,12 @@ private:
                 total_work += progress_bar.get_total();
             }
             
-            // Display overall progress
-            float overall_percent = (total_work > 0) ? 
-                (static_cast<float>(total_done) / total_work * 100.0f) : 0.0f;
+            // Display overall progress, but cap it at 100%
+            float overall_percent = 0.0f;
+            if (total_work > 0) {
+                overall_percent = static_cast<float>(total_done) / total_work * 100.0f;
+                overall_percent = std::min(overall_percent, 100.0f);
+            }
             
             std::cout << "\nOverall progress: " 
                       << std::fixed << std::setprecision(1) 
@@ -373,7 +377,13 @@ private:
                 }
             }
             
+            // If all workers are done, update their progress bars one last time and stop
             if (all_done) {
+                // Adjust progress bars to match actual processed counts
+                for (const auto& worker : workers) {
+                    auto& progress_bar = worker->get_progress_bar();
+                    progress_bar.set_total(progress_bar.get_value());
+                }
                 stop_flag = true;
             }
             
