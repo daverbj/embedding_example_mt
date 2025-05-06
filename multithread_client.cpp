@@ -579,6 +579,9 @@ int main(int argc, char* argv[]) {
         size_t total_sentences = batch_loader->get_total_count();
         std::cout << "Found " << total_sentences << " sentences in total" << std::endl;
         
+        // Start timing the embedding process
+        auto embedding_start_time = std::chrono::high_resolution_clock::now();
+        
         // Adjust thread count if we have few sentences
         if (total_sentences < static_cast<size_t>(num_threads)) {
             num_threads = std::max(1, static_cast<int>(total_sentences));
@@ -635,6 +638,10 @@ int main(int argc, char* argv[]) {
         // Stop the tracker
         tracker.stop();
         
+        // End timing for the embedding process
+        auto embedding_end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> embedding_duration = embedding_end_time - embedding_start_time;
+        
         // Collect and combine results
         std::vector<torch::Tensor> all_embeddings;
         std::vector<std::string> all_processed_sentences;
@@ -650,6 +657,10 @@ int main(int argc, char* argv[]) {
                                           processed_sentences.begin(), 
                                           processed_sentences.end());
         }
+        
+        // Report the embedding processing time
+        std::cout << "\nEmbedding processing time: " << embedding_duration.count() 
+                  << " seconds (excluding saving time)" << std::endl;
         
         // Save embeddings to file
         save_embeddings(output_file, all_processed_sentences, all_embeddings);
