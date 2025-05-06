@@ -1,0 +1,10 @@
+This is the first test sentence.
+Here is another sentence for testing the batch loading.
+The batch loader should load this sentence in a batch.
+Multiple threads should process different batches concurrently.
+This sentence should be picked up by a worker thread.
+Each worker thread should process a batch of sentences.
+Batch loading enables memory-efficient processing of large files.
+The multithreaded approach speeds up embedding generation.
+This is just a test sentence for demonstration.
+This is another test sentence for the batch loader.

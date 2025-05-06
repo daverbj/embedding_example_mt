@@ -94,10 +94,6 @@ public:
     size_t get_total() const {
         return total;
     }
-    
-    void set_total(size_t new_total) {
-        total = new_total;
-    }
 };
 
 /**
@@ -311,9 +307,7 @@ public:
             }
         }
         
-        // Mark as done and update progress bar total to match actual processed count
-        progress_bar->set_total(total_processed);
-        progress_bar->update(total_processed);
+        // Mark as done
         is_done = true;
     }
     
@@ -574,12 +568,9 @@ int main(int argc, char* argv[]) {
         
         // Create workers
         std::vector<std::shared_ptr<EmbeddingWorker>> workers;
-        // For batch loading, we can't know exactly how many sentences each thread will process
-        // So we'll use a conservative estimate and adjust dynamically at the end
-        size_t estimated_sentences_per_thread = (total_sentences + num_threads - 1) / num_threads;
         for (int i = 0; i < num_threads; ++i) {
             workers.push_back(std::make_shared<EmbeddingWorker>(
-                i + 1, batch_loader, batch_size, estimated_sentences_per_thread, model, device
+                i + 1, batch_loader, batch_size, total_sentences / num_threads, model, device
             ));
         }
         
