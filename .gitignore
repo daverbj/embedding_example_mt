@@ -1,0 +1,81 @@
+# Build directories
+build/
+build_embedding/
+build_minimal/
+build_simple/
+build_mt/
+build_mac/
+build_mt2/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Model and data files
+*.pt
+*.bin
+embeddings_output.json
+embeddings_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# MacOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# C++ objects and libs
+*.slo
+*.lo
+*.o
+*.a
+*.la
+*.lai
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+embedding_client
+multithread_client
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+Makefile
+
+# Backup files
+backup/
