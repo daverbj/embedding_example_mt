@@ -1,0 +1,11 @@
+[project]
+name = "example-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.7.0",
+    "tqdm>=4.67.1",
+    "transformers>=4.51.3",
+]
