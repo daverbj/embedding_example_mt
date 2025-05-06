@@ -59,11 +59,17 @@ public:
     }
 
     std::string print() const {
-        // Calculate the percentage
-        float percent = static_cast<float>(value) / static_cast<float>(total) * 100.0f;
+        // Calculate the percentage, avoiding division by zero
+        float percent = 0.0f;
+        if (total > 0) {
+            percent = static_cast<float>(value) / static_cast<float>(total) * 100.0f;
+        }
         
-        // Calculate the filled portion of the bar
-        int filled_length = static_cast<int>(length * value / total);
+        // Calculate the filled portion of the bar, avoiding division by zero
+        int filled_length = 0;
+        if (total > 0) {
+            filled_length = static_cast<int>(length * value / total);
+        }
         
         // Create the bar
         std::string bar;
@@ -584,10 +590,25 @@ int main(int argc, char* argv[]) {
         
         // Create workers
         std::vector<std::shared_ptr<EmbeddingWorker>> workers;
+        
+        // Calculate a sensible number of threads based on the number of sentences
+        // We don't want more threads than sentences, as that causes inefficient processing
+        int effective_num_threads = std::min(num_threads, static_cast<int>(total_sentences));
+        
+        // Ensure we have at least one thread
+        effective_num_threads = std::max(1, effective_num_threads);
+        
+        if (effective_num_threads < num_threads) {
+            std::cout << "Reducing thread count to " << effective_num_threads 
+                    << " based on the number of sentences" << std::endl;
+        }
+        
         // For batch loading, we can't know exactly how many sentences each thread will process
         // So we'll use a conservative estimate and adjust dynamically at the end
-        size_t estimated_sentences_per_thread = (total_sentences + num_threads - 1) / num_threads;
-        for (int i = 0; i < num_threads; ++i) {
+        size_t estimated_sentences_per_thread = total_sentences > 0 ? 
+            (total_sentences + effective_num_threads - 1) / effective_num_threads : 1;
+            
+        for (int i = 0; i < effective_num_threads; ++i) {
             workers.push_back(std::make_shared<EmbeddingWorker>(
                 i + 1, batch_loader, batch_size, estimated_sentences_per_thread, model, device
             ));
